@@ -177,6 +177,121 @@
                     "isPartOfComposite": false
                 }
             ]
+        },
+        {
+            "name": "Skee-ball",
+            "id": "a6a15b17-c351-475d-b636-c312cc197572",
+            "actions": [
+                {
+                    "name": "Move",
+                    "type": "Value",
+                    "id": "0c1be8f2-6dc1-4793-890b-13abe19d30c9",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Shoot",
+                    "type": "Button",
+                    "id": "f48c3126-f437-4c1d-897f-969bf1a3ec11",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "7594c793-8e62-46d4-b750-813491d35a89",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ac6748af-2a84-4dfa-ad6e-29974e9118ec",
+                    "path": "<Mouse>/delta",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "88d22261-78ce-4a21-a747-ecd6518933e3",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "439e3f19-e649-428e-9a94-d6e66e1908db",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Shoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "UI",
+            "id": "bb95884b-d1f4-4467-ba09-924c2d5a52d8",
+            "actions": [],
+            "bindings": []
+        },
+        {
+            "name": "Global",
+            "id": "3149b8b2-944d-4658-a56d-714379e115be",
+            "actions": [
+                {
+                    "name": "Pause",
+                    "type": "Button",
+                    "id": "510c9fb2-6d7b-403c-a7e6-7afd2dcbce24",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "6133c322-18b3-4c68-8697-bed810b0bec9",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e774c19b-5c54-4a76-b8d5-348c8e854ed3",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Pause",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
         }
     ],
     "controlSchemes": [
