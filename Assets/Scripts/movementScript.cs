@@ -16,6 +16,7 @@ public class movementScript : MonoBehaviour
     [SerializeField] LayerMask ground;
 
     public float jumpHeight = 6f;
+
     float velocityY;
     bool isGrounded;
 
@@ -27,39 +28,105 @@ public class movementScript : MonoBehaviour
     Vector2 currentDir;
     Vector2 currentDirVelocity;
 
-    // New Input System
+    // Input
     Vector2 moveInput;
     Vector2 lookInput;
     bool jumpPressed;
+    bool isLoading = false;
+    [SerializeField] levelLoaderScript levelLoader;
 
     void Start()
     {
+        globalInputManager.Instance.DisableAllGameplayControls();
+
         controller = GetComponent<CharacterController>();
 
         if (cursorLock)
         {
             Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false; // typically false when locked
+            Cursor.visible = false;
         }
+
+        globalInputManager.Instance.EnablePlayerControls();
     }
 
-    // Called by PlayerInput component (Move action)
-    public void OnMove(InputValue value)
+    void OnEnable()
     {
-        moveInput = value.Get<Vector2>();
+        var instance = globalInputManager.Instance;
+        if (instance == null)
+        {
+            Debug.LogWarning("globalInputManager.Instance is null in OnEnable - skipping input hookup.");
+            return;
+        }
+
+        var input = instance.Player;
+
+        input.Move.performed += OnMove;
+        input.Move.canceled += OnMove;
+
+        input.Look.performed += OnLook;
+        input.Look.canceled += OnLook;
+
+        input.Jump.performed += OnJump;
+
+        input.Interact.performed += OnInteract;
+
+        Debug.Log(instance);
     }
 
-    // Called by PlayerInput component (Look action)
-    public void OnLook(InputValue value)
+    void OnDisable()
     {
-        lookInput = value.Get<Vector2>();
+        var instance = globalInputManager.Instance;
+        if (instance == null) return;
+
+        var input = instance.Player;
+
+        input.Move.performed -= OnMove;
+        input.Move.canceled -= OnMove;
+
+        input.Look.performed -= OnLook;
+        input.Look.canceled -= OnLook;
+
+        input.Jump.performed -= OnJump;
+
+        input.Interact.performed -= OnInteract;
     }
 
-    // Called by PlayerInput component (Jump action)
-    public void OnJump(InputValue value)
+    void OnMove(InputAction.CallbackContext ctx)
     {
-        if (value.isPressed)
-            jumpPressed = true;
+        moveInput = ctx.ReadValue<Vector2>();
+    }
+
+    void OnLook(InputAction.CallbackContext ctx)
+    {
+        lookInput = ctx.ReadValue<Vector2>();
+    }
+
+    void OnJump(InputAction.CallbackContext ctx)
+    {
+        jumpPressed = true;
+    }
+
+    void OnInteract(InputAction.CallbackContext ctx)
+    {
+        if (isLoading) return;
+
+        isLoading = true;
+        Debug.Log("INTERACT PRESSED, LOADING NEXT LEVEL...");
+        if (levelLoader == null)
+        {
+            levelLoader = FindObjectOfType<levelLoaderScript>();
+        }
+
+        if (levelLoader != null)
+        {
+            levelLoader.LoadLevelIndex(1);
+        }
+        else
+        {
+            Debug.LogError("levelLoaderScript not assigned and none found in scene.");
+            isLoading = false;
+        }
     }
 
     void Update()
@@ -72,10 +139,15 @@ public class movementScript : MonoBehaviour
     {
         Vector2 targetMouseDelta = lookInput;
 
-        currentMouseDelta = Vector2.SmoothDamp(currentMouseDelta, targetMouseDelta, ref currentMouseDeltaVelocity, mouseSmoothTime);
+        currentMouseDelta = Vector2.SmoothDamp(
+            currentMouseDelta,
+            targetMouseDelta,
+            ref currentMouseDeltaVelocity,
+            mouseSmoothTime
+        );
 
         cameraCap -= currentMouseDelta.y * mouseSensitivity;
-        cameraCap = Mathf.Clamp(cameraCap, -90.0f, 90.0f);
+        cameraCap = Mathf.Clamp(cameraCap, -90f, 90f);
 
         playerCamera.localEulerAngles = Vector3.right * cameraCap;
         transform.Rotate(Vector3.up * currentMouseDelta.x * mouseSensitivity);
@@ -85,13 +157,27 @@ public class movementScript : MonoBehaviour
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, 0.2f, ground);
 
+        // Fix ground sticking
+        if (isGrounded && velocityY < 0)
+        {
+            velocityY = -2f;
+        }
+
         Vector2 targetDir = moveInput.normalized;
 
-        currentDir = Vector2.SmoothDamp(currentDir, targetDir, ref currentDirVelocity, moveSmoothTime);
+        currentDir = Vector2.SmoothDamp(
+            currentDir,
+            targetDir,
+            ref currentDirVelocity,
+            moveSmoothTime
+        );
 
-        velocityY += gravity * 2f * Time.deltaTime;
+        velocityY += gravity * Time.deltaTime;
 
-        Vector3 velocity = (transform.forward * currentDir.y + transform.right * currentDir.x) * Speed + Vector3.up * velocityY;
+        Vector3 velocity =
+            (transform.forward * currentDir.y +
+             transform.right * currentDir.x) * Speed
+            + Vector3.up * velocityY;
 
         controller.Move(velocity * Time.deltaTime);
 
@@ -99,11 +185,7 @@ public class movementScript : MonoBehaviour
         {
             velocityY = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
-        jumpPressed = false;
 
-        if (isGrounded && controller.velocity.y < -1f)
-        {
-            velocityY = -8f;
-        }
+        jumpPressed = false;
     }
 }
